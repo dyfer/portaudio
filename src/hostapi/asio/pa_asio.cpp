@@ -1048,16 +1048,18 @@ static PaError InitPaDeviceInfoFromAsioDriver( PaAsioHostApiRepresentation *asio
         deviceInfo->maxInputChannels  = paAsioDriver.info.inputChannelCount;
         deviceInfo->maxOutputChannels = paAsioDriver.info.outputChannelCount;
 
-        deviceInfo->defaultSampleRate = 0.;
-        bool foundDefaultSampleRate = false;
-        for( int j=0; j < PA_DEFAULTSAMPLERATESEARCHORDER_COUNT_; ++j )
-        {
-            ASIOError asioError = ASIOCanSampleRate( defaultSampleRateSearchOrder_[j] );
-            if( asioError != ASE_NoClock && asioError != ASE_NotPresent )
-            {
-                deviceInfo->defaultSampleRate = defaultSampleRateSearchOrder_[j];
-                foundDefaultSampleRate = true;
-                break;
+        ASIOError asioError = ASIOGetSampleRate(&deviceInfo->defaultSampleRate);
+        if (asioError != ASE_NoClock && asioError != ASE_NotPresent) {
+            bool foundDefaultSampleRate = true;
+        } else {
+            bool foundDefaultSampleRate = false;
+            for (int j = 0; j < PA_DEFAULTSAMPLERATESEARCHORDER_COUNT_; ++j) {
+                ASIOError asioError = ASIOCanSampleRate(defaultSampleRateSearchOrder_[j]);
+                if (asioError != ASE_NoClock && asioError != ASE_NotPresent) {
+                    deviceInfo->defaultSampleRate = defaultSampleRateSearchOrder_[j];
+                    foundDefaultSampleRate = true;
+                    break;
+                }
             }
         }
 
@@ -4248,4 +4250,3 @@ PaError PaAsio_SetStreamSampleRate( PaStream* s, double sampleRate )
 
     return ValidateAndSetSampleRate( sampleRate );
 }
-
