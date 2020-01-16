@@ -1049,10 +1049,10 @@ static PaError InitPaDeviceInfoFromAsioDriver( PaAsioHostApiRepresentation *asio
         deviceInfo->maxOutputChannels = paAsioDriver.info.outputChannelCount;
 
         ASIOError asioError = ASIOGetSampleRate(&deviceInfo->defaultSampleRate);
+        bool foundDefaultSampleRate = false;
         if (asioError != ASE_NoClock && asioError != ASE_NotPresent) {
-            bool foundDefaultSampleRate = true;
+            foundDefaultSampleRate = true;
         } else {
-            bool foundDefaultSampleRate = false;
             for (int j = 0; j < PA_DEFAULTSAMPLERATESEARCHORDER_COUNT_; ++j) {
                 ASIOError asioError = ASIOCanSampleRate(defaultSampleRateSearchOrder_[j]);
                 if (asioError != ASE_NoClock && asioError != ASE_NotPresent) {
